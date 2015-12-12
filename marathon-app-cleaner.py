@@ -12,10 +12,15 @@ only_use_groups=True
 
 '''
 Get all the app groups with their version timestamps
+
+marathon_endpoint - http endpoint of marathon with port number
+avoid_label_key - marathon application label "key" that is used to filter out the results
+avoid_label_value - value of the "key" that is used to filter out the results
+
 '''
-def get_apps_version_time_dict(marathon_endpoint):
+def get_apps_version_time_dict(marathon_endpoint, avoid_label_key, avoid_label_value):
 	r = requests.get("http://" + marathon_endpoint + "/v2/groups")
-	#json_file = open(fileName)
+	#r = requests.get("http://localhost:8000/sample1.json")
 	data = json.loads(r.content) 
 	group_collection = []
 
@@ -24,22 +29,26 @@ def get_apps_version_time_dict(marathon_endpoint):
 		for app in data["apps"]:
 			used_ports.append(app["ports"][0])
 	'''
-
 	for group in data["groups"]:
-			#print "group:" + str(group["id"])
 			group_def = {}
 			group_name = group["id"]
+			print "group : " + str(group_name)
 			for each_group in group["groups"]:
 				if (len(each_group["apps"])>0):
 					group_version = each_group["apps"][0]["version"]
+					group_label = each_group["apps"][0]["labels"]
+					if len(group_label) > 0:
+						group_label_env = str(group_label[avoid_label_key])
+						if(group_label_env == avoid_label_value):
+							continue
 					
-
-
-			group_def[group_name] = group_version
-			group_collection.append(group_def)
+					print 'group_version : ' + str(group_version)
+					group_def[group_name] = group_version
+			
+			if(len(group_def)!=0):
+				group_collection.append(group_def)
 						
 
-	#print used_ports
 	return group_collection
 
 
@@ -57,13 +66,9 @@ def is_old_app(date, days_filter=None, hours_filter=None):
 	d = datetime.datetime.strptime(date, format)
 	current_day = datetime.datetime.today()
 	current_day_UTC = datetime.datetime.now(timezone('UTC'))
-	#print ' current_day_UTC ' + str(current_day_UTC)
-	#print current_day
-	#print type(current_day)
 	d_utc = d.replace(tzinfo=timezone('UTC'))
-	#print '\n Subtracting current_day ' + str(current_day_UTC) + ' with given date ' + str(d_utc)
+		
 	date_diff = current_day_UTC - d_utc
-
 
 	'''Check Filter'''
 	if(days_filter != None):
@@ -74,8 +79,6 @@ def is_old_app(date, days_filter=None, hours_filter=None):
 		'''Find difference in number of hours'''
 		total_difference_in_hours = date_diff.days * 24 + (date_diff.seconds / 60 / 60)
 		'''If the difference in dates exceeds the hour filter value'''
-		print 'hours_filter : ' + str(hours_filter)
-		print 'total_difference_in_hours : ' + str(total_difference_in_hours)
 		if(total_difference_in_hours>=hours_filter):
 			return marked_for_deletion
 
@@ -83,7 +86,7 @@ def is_old_app(date, days_filter=None, hours_filter=None):
 
 
 def delete_old_apps(marathon_endpoint, days_filter=None, hours_filter=None):
-	apps_map = get_apps_version_time_dict(marathon_endpoint)
+	apps_map = get_apps_version_time_dict(marathon_endpoint, 'ENV', 'PROD')
 	for item in apps_map:
 		app_grp_name = item.keys()[0]
 		app_grp_version_timestamp = item[app_grp_name]
@@ -91,14 +94,25 @@ def delete_old_apps(marathon_endpoint, days_filter=None, hours_filter=None):
 		
 		if (is_old_app(app_grp_version_timestamp, days_filter, hours_filter)==True):
 			print "Old App. Marked for Deletion"
+			save_app(marathon_endpoint, app_grp_name)
 			print send_appgrp_delete_request(marathon_endpoint, app_grp_name)
-		
+		else:
+			print "Old App. NOT Marked for Deletion"
+
+
+def save_app(marathon_endpoint, app_grp_name):
+	r = requests.get("http://" + marathon_endpoint + "/v2/groups/"+ app_grp_name)
+	#print r.content
+	app_file = open(app_grp_name[1:]+".json", 'w')
+	app_file.write(r.content)
+	app_file.close()
+	return r.content
+
+
 
 def send_appgrp_delete_request(marathon_endpoint, appgrp):
-	delete_url = "http://" + str(marathon_endpoint) + "/v2/groups"+ appgrp
-	print delete_url
+	delete_url = "http://" + str(marathon_endpoint) + "/v2/groups"+ "/appgrp"
 	r = requests.delete(delete_url)
-	#data = json.loads(r.content) 
 	return r.content
 
 '''
