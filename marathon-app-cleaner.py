@@ -9,6 +9,8 @@ from pytz import timezone
 import argparse
 
 only_use_groups=True
+avoid_label_key=None
+avoid_label_value=None
 
 '''
 Get all the app groups with their version timestamps
@@ -18,9 +20,9 @@ avoid_label_key - marathon application label "key" that is used to filter out th
 avoid_label_value - value of the "key" that is used to filter out the results
 
 '''
-def get_apps_version_time_dict(marathon_endpoint, avoid_label_key, avoid_label_value):
-	r = requests.get("http://" + marathon_endpoint + "/v2/groups")
-	#r = requests.get("http://localhost:8000/sample1.json")
+def get_apps_version_time_dict(marathon_endpoint):
+	#r = requests.get("http://" + marathon_endpoint + "/v2/groups")
+	r = requests.get("http://localhost:8000/sample1.json")
 	data = json.loads(r.content) 
 	group_collection = []
 
@@ -86,7 +88,7 @@ def is_old_app(date, days_filter=None, hours_filter=None):
 
 
 def delete_old_apps(marathon_endpoint, days_filter=None, hours_filter=None):
-	apps_map = get_apps_version_time_dict(marathon_endpoint, 'ENV', 'PROD')
+	apps_map = get_apps_version_time_dict(marathon_endpoint)
 	for item in apps_map:
 		app_grp_name = item.keys()[0]
 		app_grp_version_timestamp = item[app_grp_name]
@@ -133,6 +135,10 @@ if __name__ == '__main__':
                    help='Number of days old')
 	parser.add_argument('--hours', metavar='H', type=int, 
                    help='Number of hours old')
+	parser.add_argument('--filterkey', type=str, 
+                   help='Key for the application label that needs to be filtered out')
+	parser.add_argument('--filterkeyval',  type=str, 
+                   help='Value of the Key for application label that needs to be filtered out')
 	'''parser.add_argument('--ignoreapps',metavar='IGNORE', type=bool,
                    help='ignore Applications, and only consider Application Groups')'''
 		
@@ -141,6 +147,8 @@ if __name__ == '__main__':
 	
 
 	only_use_groups = True
+	avoid_label_key = args.filterkey
+	avoid_label_value = args.filterkeyval
 
 	delete_old_apps(args.marathon, args.days, args.hours)
 
