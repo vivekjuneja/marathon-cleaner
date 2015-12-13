@@ -15,5 +15,37 @@ We also need service that can be in future be used to provide auto-destroy featu
 2. Prevent some applicatioms from being removed automatically through the use of Marathon application labels. Currently, all applications that NEED NOT be removed must adhere to a common Marathon Application label (Key and Value). 
 3. Store the Application Deployment manifest to filesystem before deleting the Application. This is useful to store / archive old deployments. 
 
+Currently, the marathon cleaner appliation only considers Application Groups deployed on Marathon. Applications that are NOT deployed as a Group, but as just Marathon Application are Ignored. The support will be added in the next revision.
 
 ##How to Use
+
+```
+$ python marathon-app-cleaner.py -h
+
+usage: marathon-app-cleaner.py [-h] [--marathon M] [--days D] [--hours H]
+                               [--filterkey FILTERKEY]
+                               [--filterkeyval FILTERKEYVAL]
+
+Removes old Applications on Marathon to save Capacity
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --marathon M          The Marathon endpoint (eg: 10.53.15.219:18080)
+  --days D              Number of days old
+  --hours H             Number of hours old
+  --filterkey FILTERKEY
+                        Key for the application label that needs to be
+                        filtered out
+  --filterkeyval FILTERKEYVAL
+                        Value of the Key for application label that needs to
+                        be filtered out
+```
+
+Example 1:-
+
+```
+python marathon-app-cleaner.py --marathon 192.168.33.10:8080 --hours 1 --filterkey ENV --filterkeyval PROD
+```
+
+The above parameters allow the marathon cleaner app to connect to Marathon endpoint, and remove applications that are 1 hour Old. It ignores the Application who have a Label with the key as "ENV" with the value as "PROD". 
+
