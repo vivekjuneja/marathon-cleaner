@@ -147,14 +147,6 @@ def send_appgrp_delete_request(marathon_endpoint, appgrp):
 	r = requests.delete(delete_url)
 	return r.content
 
-'''
-For decorating the output as per needs of Bash Script
-'''
-def render_bash_output(array):
-	bash_array=""
-	for item in array:
-		bash_array += str(item) + " "
-	return (bash_array.strip())
 
 
 if __name__ == '__main__':
