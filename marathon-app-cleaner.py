@@ -113,7 +113,7 @@ def save_app(marathon_endpoint, app_grp_name):
 
 
 def send_appgrp_delete_request(marathon_endpoint, appgrp):
-	delete_url = "http://" + str(marathon_endpoint) + "/v2/groups"+ "/appgrp"
+	delete_url = "http://" + str(marathon_endpoint) + "/v2/groups"+ appgrp
 	r = requests.delete(delete_url)
 	return r.content
 
