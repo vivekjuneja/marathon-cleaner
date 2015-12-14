@@ -21,10 +21,10 @@ Currently, the marathon cleaner appliation only considers Application Groups dep
 
 ```
 $ python marathon-app-cleaner.py -h
-
 usage: marathon-app-cleaner.py [-h] [--marathon M] [--days D] [--hours H]
                                [--filterkey FILTERKEY]
                                [--filterkeyval FILTERKEYVAL]
+                               [--backupdir BACKUPDIR]
 
 Removes old Applications on Marathon to save Capacity
 
@@ -39,12 +39,15 @@ optional arguments:
   --filterkeyval FILTERKEYVAL
                         Value of the Key for application label that needs to
                         be filtered out
+  --backupdir BACKUPDIR
+                        Locatin of the Backup Directory where Old Deployment
+                        manifests would be stored
 ```
 
 Example 1:-
 
 ```
-python marathon-app-cleaner.py --marathon 192.168.33.10:8080 --hours 1 --filterkey ENV --filterkeyval PROD
+python marathon-app-cleaner.py --marathon 192.168.33.10:8080 --hours 1 --filterkey ENV --filterkeyval PROD --backupdir /tmp/marathon-backup
 ```
 
 The above parameters allow the marathon cleaner app to connect to Marathon endpoint, and remove applications that are 1 hour Old. It ignores the Application who have a Label with the key as "ENV" with the value as "PROD". 
