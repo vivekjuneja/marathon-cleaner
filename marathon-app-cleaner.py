@@ -165,7 +165,7 @@ if __name__ == '__main__':
 	parser.add_argument('--filterkeyval',  type=str, 
                    help='Value of the Key for application label that needs to be filtered out')
 	parser.add_argument('--backupdir',  type=str, 
-                   help='Locatin of the Backup Directory where Old Deployment manifests would be stored')
+                   help='Location of the Backup Directory where Old Deployment manifests would be stored')
 	'''parser.add_argument('--ignoreapps',metavar='IGNORE', type=bool,
                    help='ignore Applications, and only consider Application Groups')'''
 		
