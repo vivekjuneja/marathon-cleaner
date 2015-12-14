@@ -21,6 +21,7 @@ import argparse
 only_use_groups=True    # Only delete Applicaton Groups
 avoid_label_key=None    # The Marathon Label Key to be used to ignore application groups
 avoid_label_value=None  # The Marathon Label Value for the Key to be used to ignore application groups
+backup_directory=None
 
 '''
 Get all the app groups with their version timestamps
@@ -132,7 +133,9 @@ application group Name
 def save_app(marathon_endpoint, app_grp_name):
 	r = requests.get("http://" + marathon_endpoint + "/v2/groups/"+ app_grp_name)
 	#print r.content
-	app_file = open(app_grp_name[1:]+".json", 'w')
+	fileName = backup_directory + str(app_grp_name[1:])+".json"
+	print 'Saving to directory : ' + str(fileName)
+	app_file = open(fileName, 'w')
 	app_file.write(r.content)
 	app_file.close()
 	return r.content
@@ -161,6 +164,8 @@ if __name__ == '__main__':
                    help='Key for the application label that needs to be filtered out')
 	parser.add_argument('--filterkeyval',  type=str, 
                    help='Value of the Key for application label that needs to be filtered out')
+	parser.add_argument('--backupdir',  type=str, 
+                   help='Locatin of the Backup Directory where Old Deployment manifests would be stored')
 	'''parser.add_argument('--ignoreapps',metavar='IGNORE', type=bool,
                    help='ignore Applications, and only consider Application Groups')'''
 		
@@ -169,6 +174,7 @@ if __name__ == '__main__':
 	only_use_groups = True
 	avoid_label_key = args.filterkey
 	avoid_label_value = args.filterkeyval
+	backup_directory =  args.backupdir
 
 	delete_old_apps(args.marathon, args.days, args.hours)
 
