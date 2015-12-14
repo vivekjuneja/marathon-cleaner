@@ -17,6 +17,15 @@ We also need service that can be in future be used to provide auto-destroy featu
 
 Currently, the marathon cleaner appliation only considers Application Groups deployed on Marathon. Applications that are NOT deployed as a Group, but as just Marathon Application are Ignored. The support will be added in the next revision.
 
+##Overall process
+The utility performs the following :-
+
+1. Calls Marathon API to get a list of all application groups.
+2. Look for Version time stamp for each Application under Application group.
+3. If the version time stamp is older than the configured time (days or Hours), take a backup of the Deployment manifest of the app, and then DELETE it by calling Marathon API.
+4. If we have provided a special label to the Deployment manifest of the application, then the Utility ignores the particular Application group.
+
+
 ##How to Use
 
 ```
