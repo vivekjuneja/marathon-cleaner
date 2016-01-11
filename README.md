@@ -1,3 +1,5 @@
+<a href="https://codeclimate.com/repos/569310f916dbe3661400264b/feed"><img src="https://codeclimate.com/repos/569310f916dbe3661400264b/badges/3fcd83a7d441ad5dd53f/gpa.svg" /></a>
+
 # marathon-cleaner
 This utility helps in removing deployed applications running on Marathon that are deemed old by a certain criteria. This is essential for building short-lived ephemeral development and test environments of applications deployed on Marathon. 
 
